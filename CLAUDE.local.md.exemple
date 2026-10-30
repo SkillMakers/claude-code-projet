@@ -1,0 +1,5 @@
+# Copie ce fichier en CLAUDE.local.md (ignore par git) pour tes preferences personnelles.
+
+- Reponds-moi en francais, de facon concise.
+- Mon environnement local : l'application tourne sur http://localhost:8081 (le 8080 est pris).
+- Commande de test rapide que je prefere : `./mvnw -q test`.

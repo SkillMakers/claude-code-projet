@@ -1,0 +1,14 @@
+target/
+*.log
+.idea/
+*.iml
+.vscode/
+
+# Secrets : jamais dans git
+.env
+.env.*
+!.env.exemple
+
+# Configuration Claude Code personnelle
+CLAUDE.local.md
+.claude/settings.local.json
