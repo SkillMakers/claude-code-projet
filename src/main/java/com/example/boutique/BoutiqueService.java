@@ -3,6 +3,7 @@ package com.example.boutique;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,8 +23,8 @@ public class BoutiqueService {
 			"C-1002", new Commande("C-1002", "bob@exemple.fr", LocalDate.of(2026, 10, 17), StatutCommande.PAYEE, new BigDecimal("249.00"))));
 
 	public List<Produit> rechercher(String motCle) {
-		String m = motCle.toLowerCase();
-		return produits.stream().filter(p -> p.nom().toLowerCase().contains(m)).toList();
+		String m = motCle.toLowerCase(Locale.ROOT);
+		return produits.stream().filter(p -> p.nom().toLowerCase(Locale.ROOT).contains(m)).toList();
 	}
 
 	public Commande commande(String numero) {
@@ -37,7 +38,10 @@ public class BoutiqueService {
 	public Commande annuler(String numero) {
 		Commande c = commande(numero);
 		if (c.statut() == StatutCommande.EXPEDIEE) {
-			throw new IllegalStateException("La commande " + numero + " est deja expediee : annulation impossible");
+			throw new AnnulationImpossibleException("La commande " + numero + " est deja expediee : annulation impossible");
+		}
+		if (c.statut() == StatutCommande.ANNULEE) {
+			throw new AnnulationImpossibleException("La commande " + numero + " est deja annulee");
 		}
 		Commande annulee = c.annulee();
 		commandes.put(numero, annulee);

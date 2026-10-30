@@ -10,7 +10,9 @@ const texte = outil.content ?? outil.new_string ?? "";
 const motifs = [
   /sk-(live|proj)-[A-Za-z0-9_-]{16,}/, // cle d'API de type sk-live-..., sk-proj-...
   /AKIA[0-9A-Z]{16}/, // cle d'acces AWS
-  /(password|secret|api[-_.]?key|cle[-_.]?api)\s*[=:]\s*["']?[A-Za-z0-9_\-]{12,}/i,
+  // nom de secret = valeur litterale d'au moins 16 caracteres, seule en fin de ligne
+  // (laisse passer passwordEncoder.encode(...), ${VARIABLE} et les valeurs courtes d'exemple)
+  /(password|secret|api[-_.]?key|cle[-_.]?api)\w*\s*[=:]\s*["']?[A-Za-z0-9+/_-]{16,}={0,2}["']?\s*;?\s*$/im,
 ];
 
 const trouve = motifs.find((motif) => motif.test(texte));

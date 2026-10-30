@@ -42,8 +42,8 @@ public class BoutiqueController {
 		return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
 	}
 
-	@ExceptionHandler(IllegalStateException.class)
-	public ProblemDetail conflit(IllegalStateException e) {
+	@ExceptionHandler(AnnulationImpossibleException.class)
+	public ProblemDetail conflit(AnnulationImpossibleException e) {
 		return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
 	}
 }

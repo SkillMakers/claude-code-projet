@@ -6,9 +6,17 @@ const entree = JSON.parse(readFileSync(0, "utf8"));
 const commande = entree.tool_input?.command ?? "";
 
 const interdites = [
-  { motif: /git\s+push\s+.*(--force|-f\b)/, raison: "git push --force est interdit sur ce depot." },
-  { motif: /rm\s+-rf?\s+(\/|~|\.)(\s|$)/, raison: "Suppression recursive de la racine, du home ou du projet." },
-  { motif: /mvnw?\s+.*\bdeploy\b/, raison: "Le deploiement passe par la CI, jamais depuis un poste." },
+  {
+    // --force, --force-with-lease, -f, -uf..., ou +branche
+    motif: /\bgit\s+push\b.*(\s--force\b|\s-[a-zA-Z]*f\b|\s\+\S)/,
+    raison: "git push --force est interdit sur ce depot.",
+  },
+  {
+    // rm -r, -rf, -fr, -Rf... sur /, ~, . ou *, avec ou sans / final
+    motif: /\brm\s+(-[a-zA-Z]*[rR][a-zA-Z]*\s+)+(\/|~|\.|\*)\/?(\s|$)/,
+    raison: "Suppression recursive de la racine, du home ou du projet.",
+  },
+  { motif: /\bmvnw?(\.cmd)?\s+.*\bdeploy\b/, raison: "Le deploiement passe par la CI, jamais depuis un poste." },
 ];
 
 const trouvee = interdites.find((r) => r.motif.test(commande));

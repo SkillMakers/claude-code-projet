@@ -20,9 +20,17 @@ class BoutiqueServiceTest {
 	}
 
 	@Test
+	void refuser_une_deuxieme_annulation() {
+		boutique.annuler("C-1002");
+		assertThatThrownBy(() -> boutique.annuler("C-1002"))
+				.isInstanceOf(AnnulationImpossibleException.class)
+				.hasMessageContaining("deja annulee");
+	}
+
+	@Test
 	void refuser_l_annulation_d_une_commande_expediee() {
 		assertThatThrownBy(() -> boutique.annuler("C-1001"))
-				.isInstanceOf(IllegalStateException.class)
+				.isInstanceOf(AnnulationImpossibleException.class)
 				.hasMessageContaining("deja expediee");
 	}
 }

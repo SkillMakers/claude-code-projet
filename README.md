@@ -28,8 +28,9 @@ claude-code-projet/
     │   └── relecteur.md          # Sous-agent en lecture seule (Read, Grep, Glob)
     └── hooks/
         ├── garde-secrets.mjs         # PreToolUse : refuse d'ecrire un secret en clair
-        ├── commandes-interdites.mjs  # PreToolUse : refuse git push --force, mvn deploy...
-        └── tests-avant-fin.mjs       # Stop : Claude ne peut pas finir si les tests echouent
+        ├── commandes-interdites.mjs  # PreToolUse : refuse git push --force, rm -rf ., mvn deploy
+        ├── tests-avant-fin.mjs       # Stop : Claude ne peut pas finir si les tests echouent
+        └── tester-les-hooks.mjs      # Teste les hooks sans Claude : node .claude/hooks/tester-les-hooks.mjs
 ```
 
 ## Qui sert a quoi
@@ -50,11 +51,13 @@ Les permissions et les hooks sont executes par Claude Code lui-meme : c'est la q
 ## Ce qu'on a mesure en construisant ce depot
 
 - Une regle `deny` sur `Read(./.env.*)` bloque aussi l'**ecriture** : Claude Code refuse le `Write` avant meme que le hook soit appele.
+  Et elle bloque aussi `cat .env` lance par l'outil Bash.
 - Avec la consigne dans `CLAUDE.md`, Claude refuse de lui-meme d'ecrire une cle en clair ou de faire `git push --force`.
   Le hook n'intervient que s'il insiste ou se trompe : c'est le filet, pas la premiere ligne.
 - Le hook `garde-secrets` ne surveille que `Edit|Write`. Une commande shell (`echo ... >> fichier`) passe a cote :
   c'est pour ca qu'on garde aussi les permissions.
-- Le hook `Stop` relance Claude quand un test casse. Le champ `stop_hook_active` evite la boucle infinie.
+- Le hook `Stop` relance Claude quand un test casse, ou quand le code ne compile plus. Le champ `stop_hook_active` evite la boucle infinie.
+- Un hook se teste **sans Claude** : `node .claude/hooks/tester-les-hooks.mjs` lui envoie le JSON qu'il recevrait.
 
 ## Utiliser ce depot
 
@@ -62,7 +65,8 @@ Les permissions et les hooks sont executes par Claude Code lui-meme : c'est la q
 git clone https://github.com/SkillMakers/claude-code-projet.git
 cd claude-code-projet
 cp CLAUDE.local.md.exemple CLAUDE.local.md   # optionnel
-./mvnw test                                  # 5 tests
+./mvnw test                                  # 6 tests
+node .claude/hooks/tester-les-hooks.mjs      # 12 cas
 claude                                        # accepte la confiance du dossier, puis essaie /nouvel-endpoint
 ```
 
